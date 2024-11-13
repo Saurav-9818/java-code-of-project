@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .activity-form { margin-bottom: 20px; }
+        .activity-list { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Fitness Tracker</h1>
+    <div class="activity-form">
+        <input type="text" id="activityName" placeholder="Activity Name">
+        <input type="number" id="activityDuration" placeholder="Duration (minutes)">
+        <input type="number" id="activityCalories" placeholder="Calories Burned">
+        <button onclick="addActivity()">Add Activity</button>
+    </div>
+    <div class="activity-list">
+        <h2>Activities</h2>
+        <ul id="activityList"></ul>
+    </div>
+
+    <script>
+        async function addActivity() {
+            const name = document.getElementById('activityName').value;
+            const duration = document.getElementById('activityDuration').value;
+            const caloriesBurned = document.getElementById('activityCalories').value;
+
+            await fetch('http://localhost:8080/api/activities', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, duration, caloriesBurned })
+            });
+
+            loadActivities();
+        }
+
+        async function loadActivities() {
+            const response = await fetch('http://localhost:8080/api/activities');
+            const activities = await response.json();
+
+            const activityList = document.getElementById('activityList');
+            activityList.innerHTML = '';
+            activities.forEach(activity => {
+                const li = document.createElement('li');
+                li.textContent = ${activity.name} - ${activity.duration} mins - ${activity.caloriesBurned} calories;
+                activityList.appendChild(li);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadActivities);
+    </script>
+</body>
+</html>
